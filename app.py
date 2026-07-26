@@ -145,6 +145,14 @@ def api_summary():
         ORDER BY (platform = 'manual') ASC, total DESC
     """).fetchall()
 
+    by_source_type = conn.execute("""
+        SELECT source_type, COALESCE(SUM(amount), 0) as total,
+               COUNT(*) as entries
+        FROM income_entries
+        GROUP BY source_type
+        ORDER BY total DESC
+    """).fetchall()
+
     window_start = (datetime.now(timezone.utc) - timedelta(days=365)).date().isoformat()
     daily = conn.execute("""
         SELECT entry_date, COALESCE(SUM(amount), 0) as total
@@ -206,6 +214,7 @@ def api_summary():
         "total": round(total, 2),
         "by_source": [dict(r) for r in by_source],
         "by_platform": [dict(r) for r in by_platform],
+        "by_source_type": [dict(r) for r in by_source_type],
         "daily_12mo": [dict(r) for r in daily],
         "monthly": [dict(r) for r in monthly],
         "yearly": [dict(r) for r in yearly],

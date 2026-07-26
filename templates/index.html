@@ -96,7 +96,6 @@
   .stat-block.right .stat-figure {
     color: var(--money-bright);
     text-shadow: 0 0 14px rgba(127, 255, 176, 0.5), 0 0 32px rgba(127, 255, 176, 0.25);
-    font-size: clamp(2rem, 5vw, 4.5rem);
   }
 
   main {
@@ -121,12 +120,32 @@
   .history-section {
     padding: 0 3rem 2.5rem;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.6fr 1fr 1fr;
     gap: 2.5rem;
   }
 
-  @media (max-width: 900px) {
+  @media (max-width: 1100px) {
     .history-section { grid-template-columns: 1fr; }
+  }
+
+  .scrollable-list {
+    max-height: 360px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--ledger-line) transparent;
+  }
+
+  .scrollable-list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollable-list::-webkit-scrollbar-thumb {
+    background: var(--ledger-line);
+    border-radius: 3px;
+  }
+
+  .scrollable-list::-webkit-scrollbar-track {
+    background: transparent;
   }
 
   .panel {
@@ -355,7 +374,7 @@
 <main>
   <div class="panel">
     <h2>By Source</h2>
-    <div id="sources-list">
+    <div id="sources-list" class="scrollable-list">
       <div class="empty-state">
         No income recorded yet. <span class="prompt">&gt;</span> Add a source below once something ships.
       </div>
@@ -386,7 +405,7 @@
 
     <div class="panel">
       <h2>By Platform</h2>
-      <div id="platform-list">
+      <div id="platform-list" class="scrollable-list">
         <div class="empty-state">No income recorded yet.</div>
       </div>
     </div>
@@ -396,7 +415,7 @@
 <section class="history-section">
   <div class="panel">
     <h2>By Month</h2>
-    <div id="monthly-list">
+    <div id="monthly-list" class="scrollable-list">
       <div class="empty-state">No income recorded yet.</div>
     </div>
   </div>
@@ -404,6 +423,13 @@
   <div class="panel">
     <h2>By Year</h2>
     <div id="yearly-list">
+      <div class="empty-state">No income recorded yet.</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>By Source Type</h2>
+    <div id="source-type-list">
       <div class="empty-state">No income recorded yet.</div>
     </div>
   </div>
@@ -494,6 +520,29 @@ const PLATFORM_LABELS = {
   admob: 'AdMob',
   manual: 'Manual entry',
 };
+
+const SOURCE_TYPE_LABELS = {
+  app: 'App',
+  website: 'Website',
+  service: 'Service',
+  other: 'Other',
+};
+
+function renderSourceType(bySourceType) {
+  const el = document.getElementById('source-type-list');
+  if (!bySourceType.length) {
+    el.innerHTML = '<div class="empty-state">No income recorded yet.</div>';
+    return;
+  }
+  el.innerHTML = bySourceType.map(t => `
+    <div class="source-row">
+      <div>
+        <span class="source-name">${SOURCE_TYPE_LABELS[t.source_type] || t.source_type}</span>
+      </div>
+      <div class="source-amount">$${t.total.toFixed(2)}</div>
+    </div>
+  `).join('');
+}
 
 function renderPlatforms(byPlatform, manualEntries) {
   const el = document.getElementById('platform-list');
@@ -601,6 +650,7 @@ async function refresh() {
   renderTrend(data.daily_12mo);
   renderTicker(data.by_source);
   renderPlatforms(data.by_platform, data.manual_entries);
+  renderSourceType(data.by_source_type);
   renderMonthly(data.monthly);
   renderYearly(data.yearly);
 }
