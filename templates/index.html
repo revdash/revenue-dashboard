@@ -45,30 +45,58 @@
     margin: 0 0 0.75rem;
   }
 
-  .total-figure {
-    font-family: var(--mono);
-    font-size: clamp(3.5rem, 9vw, 7rem);
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    color: var(--money);
-    text-shadow: 0 0 12px rgba(57, 255, 106, 0.55), 0 0 32px rgba(57, 255, 106, 0.25);
-    margin: 0;
-    line-height: 1;
-    display: flex;
-    align-items: baseline;
-    gap: 0.75rem;
-  }
-
-  .total-figure .cents {
-    font-size: 0.4em;
-    color: var(--ink-dim);
-  }
-
   .as-of {
     font-family: var(--mono);
     font-size: 0.8rem;
     color: var(--ink-dim);
-    margin-top: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    width: 100%;
+  }
+
+  .stat-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .stat-block.center {
+    align-items: center;
+  }
+
+  .stat-block.right {
+    align-items: flex-end;
+  }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin: 0 0 0.4rem;
+  }
+
+  .stat-figure {
+    font-family: var(--mono);
+    font-size: clamp(1.6rem, 4vw, 3.2rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--money);
+    text-shadow: 0 0 10px rgba(57, 255, 106, 0.45), 0 0 24px rgba(57, 255, 106, 0.2);
+    margin: 0;
+    line-height: 1;
+  }
+
+  .stat-block.right .stat-figure {
+    color: var(--money-bright);
+    text-shadow: 0 0 14px rgba(127, 255, 176, 0.5), 0 0 32px rgba(127, 255, 176, 0.25);
+    font-size: clamp(2rem, 5vw, 4.5rem);
   }
 
   main {
@@ -82,6 +110,23 @@
 
   @media (max-width: 900px) {
     main { grid-template-columns: 1fr; }
+  }
+
+  .right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .history-section {
+    padding: 0 3rem 2.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+  }
+
+  @media (max-width: 900px) {
+    .history-section { grid-template-columns: 1fr; }
   }
 
   .panel {
@@ -116,6 +161,36 @@
     color: var(--ink);
   }
 
+  .delete-btn {
+    background: none;
+    border: 1px solid var(--ledger-line);
+    color: var(--ink-dim);
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    line-height: 1;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-left: 0.6rem;
+  }
+
+  .delete-btn:hover {
+    color: #ff6b6b;
+    border-color: #ff6b6b;
+  }
+
+  .manual-section-label {
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--ledger-line);
+    padding: 0.5rem 0 0.4rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+  }
+
   .source-type {
     font-family: var(--mono);
     font-size: 0.7rem;
@@ -144,13 +219,44 @@
     color: var(--money);
   }
 
+  .add-form-toggle {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--ledger-line);
+  }
+
+  .add-form-toggle summary {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    cursor: pointer;
+    padding: 0.2rem 0;
+    list-style: none;
+  }
+
+  .add-form-toggle summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .add-form-toggle summary::before {
+    content: '\25b8  ';
+  }
+
+  .add-form-toggle[open] summary::before {
+    content: '\25be  ';
+  }
+
+  .add-form-toggle summary:hover {
+    color: var(--money);
+  }
+
   .add-form {
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
-    margin-top: 1.25rem;
-    padding-top: 1.25rem;
-    border-top: 1px solid var(--ledger-line);
+    margin-top: 0.9rem;
   }
 
   .add-form input, .add-form select {
@@ -229,7 +335,20 @@
 
 <header>
   <p class="eyebrow">Revdash &mdash; Live Ledger</p>
-  <h1 class="total-figure" id="total-figure">$<span id="total-int">0</span><span class="cents">.<span id="total-cents">00</span></span></h1>
+  <div class="stat-row">
+    <div class="stat-block">
+      <p class="stat-label">This Month</p>
+      <p class="stat-figure" id="stat-month">$0.00</p>
+    </div>
+    <div class="stat-block center">
+      <p class="stat-label">Last Month</p>
+      <p class="stat-figure" id="stat-lastmonth">$0.00</p>
+    </div>
+    <div class="stat-block right">
+      <p class="stat-label">All Time</p>
+      <p class="stat-figure" id="stat-alltime">$0.00</p>
+    </div>
+  </div>
   <p class="as-of" id="as-of">Awaiting first entry</p>
 </header>
 
@@ -242,25 +361,53 @@
       </div>
     </div>
 
-    <div class="add-form">
-      <input type="text" id="f-name" placeholder="Source name (e.g. MyApp)">
-      <select id="f-type">
-        <option value="app">App</option>
-        <option value="website">Website</option>
-        <option value="service">Service</option>
-        <option value="other">Other</option>
-      </select>
-      <input type="number" step="0.01" id="f-amount" placeholder="Amount (USD)">
-      <input type="date" id="f-date">
-      <button onclick="addEntry()">Log Income</button>
+    <details class="add-form-toggle">
+      <summary>Add manual entry</summary>
+      <div class="add-form">
+        <input type="text" id="f-name" placeholder="Source name (e.g. MyApp)">
+        <select id="f-type">
+          <option value="app">App</option>
+          <option value="website">Website</option>
+          <option value="service">Service</option>
+          <option value="other">Other</option>
+        </select>
+        <input type="number" step="0.01" id="f-amount" placeholder="Amount (USD)">
+        <input type="date" id="f-date">
+        <button onclick="addEntry()">Log Income</button>
+      </div>
+    </details>
+  </div>
+
+  <div class="right-column">
+    <div class="panel">
+      <h2>Last 12 Months</h2>
+      <svg id="trend-chart" viewBox="0 0 400 140" preserveAspectRatio="none"></svg>
+    </div>
+
+    <div class="panel">
+      <h2>By Platform</h2>
+      <div id="platform-list">
+        <div class="empty-state">No income recorded yet.</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<section class="history-section">
+  <div class="panel">
+    <h2>By Month</h2>
+    <div id="monthly-list">
+      <div class="empty-state">No income recorded yet.</div>
     </div>
   </div>
 
   <div class="panel">
-    <h2>Last 30 Days</h2>
-    <svg id="trend-chart" viewBox="0 0 400 140" preserveAspectRatio="none"></svg>
+    <h2>By Year</h2>
+    <div id="yearly-list">
+      <div class="empty-state">No income recorded yet.</div>
+    </div>
   </div>
-</main>
+</section>
 
 <footer>
   <div class="ticker-track" id="ticker">Waiting for the first sale to hit the ledger&hellip;</div>
@@ -270,12 +417,6 @@
 async function fetchSummary() {
   const res = await fetch('/api/summary');
   return res.json();
-}
-
-function fmtMoney(n) {
-  const parts = Math.abs(n).toFixed(2).split('.');
-  const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  return { int: intPart, cents: parts[1] };
 }
 
 function renderSources(bySource) {
@@ -303,17 +444,38 @@ function renderTrend(daily) {
   }
   const max = Math.max(...daily.map(d => d.total), 1);
   const w = 400, h = 140, pad = 10;
+  const chartTop = 28;     // leave room for the peak-value label above the line
+  const chartBottom = h - 24;  // leave room for date labels below
   const stepX = (w - pad * 2) / Math.max(daily.length - 1, 1);
   const points = daily.map((d, i) => {
     const x = pad + i * stepX;
-    const y = h - pad - (d.total / max) * (h - pad * 2);
+    const y = chartBottom - (d.total / max) * (chartBottom - chartTop);
     return `${x},${y}`;
   }).join(' ');
-  const areaPoints = `${pad},${h - pad} ${points} ${w - pad},${h - pad}`;
+  const areaPoints = `${pad},${chartBottom} ${points} ${w - pad},${chartBottom}`;
+
+  const peakIndex = daily.reduce((best, d, i) => d.total > daily[best].total ? i : best, 0);
+  const peakX = pad + peakIndex * stepX;
+  const peakY = chartBottom - (daily[peakIndex].total / max) * (chartBottom - chartTop);
+  const peakLabelX = Math.min(Math.max(peakX, 30), w - 40);
+
+  const firstDate = formatShortDate(daily[0].entry_date);
+  const lastDate = formatShortDate(daily[daily.length - 1].entry_date);
+
   svg.innerHTML = `
     <polygon points="${areaPoints}" fill="#39ff6a" opacity="0.12"></polygon>
     <polyline points="${points}" fill="none" stroke="#39ff6a" stroke-width="2"></polyline>
+    <circle cx="${peakX}" cy="${peakY}" r="3" fill="#39ff6a"></circle>
+    <text x="${peakLabelX}" y="${Math.max(peakY - 10, 12)}" fill="#7fffb0" font-family="monospace" font-size="12" text-anchor="middle">$${daily[peakIndex].total.toFixed(2)}</text>
+    <text x="${pad}" y="${chartBottom + 16}" fill="#8a8f96" font-family="monospace" font-size="10">${firstDate}</text>
+    <text x="${w - pad}" y="${chartBottom + 16}" fill="#8a8f96" font-family="monospace" font-size="10" text-anchor="end">${lastDate}</text>
+    <text x="${pad}" y="${chartBottom + 4}" fill="#8a8f96" font-family="monospace" font-size="9">$0</text>
   `;
+}
+
+function formatShortDate(isoDate) {
+  const d = new Date(isoDate + 'T00:00:00');
+  return `${MONTH_NAMES[d.getMonth()]} ${d.getDate()}`;
 }
 
 function renderTicker(bySource) {
@@ -326,16 +488,121 @@ function renderTicker(bySource) {
     '<span class="tick-sep">&bull;</span>' + parts.join('<span class="tick-sep">&bull;</span>');
 }
 
+const PLATFORM_LABELS = {
+  appstore: 'App Store Connect',
+  stripe: 'Stripe',
+  admob: 'AdMob',
+  manual: 'Manual entry',
+};
+
+function renderPlatforms(byPlatform, manualEntries) {
+  const el = document.getElementById('platform-list');
+  if (!byPlatform.length) {
+    el.innerHTML = '<div class="empty-state">No income recorded yet.</div>';
+    return;
+  }
+
+  const visible = byPlatform.filter(p => p.platform !== 'manual');
+  const manualTotal = byPlatform.find(p => p.platform === 'manual');
+
+  const rowHtml = p => `
+    <div class="source-row">
+      <div>
+        <span class="source-name">${PLATFORM_LABELS[p.platform] || p.platform}</span>
+      </div>
+      <div class="source-amount">$${p.total.toFixed(2)}</div>
+    </div>
+  `;
+
+  let html = visible.length
+    ? visible.map(rowHtml).join('')
+    : '<div class="empty-state">No synced income yet.</div>';
+
+  if (manualTotal && manualEntries && manualEntries.length) {
+    const entryRows = manualEntries.map(e => `
+      <div class="source-row manual-entry-row">
+        <div>
+          <span class="source-name">${e.source_name}</span>
+          <span class="source-type">${e.entry_date}</span>
+        </div>
+        <div>
+          <span class="source-amount">$${e.amount.toFixed(2)}</span>
+          <button class="delete-btn" onclick="deleteOneEntry(${e.id})" title="Delete this entry">&times;</button>
+        </div>
+      </div>
+    `).join('');
+
+    html += `
+      <div class="manual-section-label">Manual entries (${manualEntries.length}) &mdash; $${manualTotal.total.toFixed(2)}</div>
+      ${entryRows}
+    `;
+  }
+
+  el.innerHTML = html;
+}
+
+async function deleteOneEntry(id) {
+  if (!confirm('Delete this manual entry?')) return;
+  const resp = await fetch(`/api/income/${id}`, { method: 'DELETE' });
+  if (!resp.ok) {
+    const body = await resp.json().catch(() => ({}));
+    alert(body.error || 'Could not delete that entry.');
+    return;
+  }
+  refresh();
+}
+
+const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function renderMonthly(monthly) {
+  const el = document.getElementById('monthly-list');
+  if (!monthly.length) {
+    el.innerHTML = '<div class="empty-state">No income recorded yet.</div>';
+    return;
+  }
+  el.innerHTML = monthly.map(m => {
+    const [year, month] = m.month.split('-');
+    const label = `${MONTH_NAMES[parseInt(month, 10) - 1]} ${year}`;
+    return `
+      <div class="source-row">
+        <div><span class="source-name">${label}</span></div>
+        <div class="source-amount">$${m.total.toFixed(2)}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderYearly(yearly) {
+  const el = document.getElementById('yearly-list');
+  if (!yearly.length) {
+    el.innerHTML = '<div class="empty-state">No income recorded yet.</div>';
+    return;
+  }
+  el.innerHTML = yearly.map(y => `
+    <div class="source-row">
+      <div><span class="source-name">${y.year}</span></div>
+      <div class="source-amount">$${y.total.toFixed(2)}</div>
+    </div>
+  `).join('');
+}
+
+function renderStatRow(data) {
+  document.getElementById('stat-month').textContent = '$' + data.mom_current.toFixed(2);
+  document.getElementById('stat-lastmonth').textContent = '$' + data.mom_previous.toFixed(2);
+  document.getElementById('stat-alltime').textContent = '$' + data.total.toFixed(2);
+}
+
 async function refresh() {
   const data = await fetchSummary();
-  const { int, cents } = fmtMoney(data.total);
-  document.getElementById('total-int').textContent = int;
-  document.getElementById('total-cents').textContent = cents;
   document.getElementById('as-of').textContent =
     'Updated ' + new Date(data.generated_at).toLocaleString();
+  renderStatRow(data);
   renderSources(data.by_source);
-  renderTrend(data.daily_last_30);
+  renderTrend(data.daily_12mo);
   renderTicker(data.by_source);
+  renderPlatforms(data.by_platform, data.manual_entries);
+  renderMonthly(data.monthly);
+  renderYearly(data.yearly);
 }
 
 async function addEntry() {
